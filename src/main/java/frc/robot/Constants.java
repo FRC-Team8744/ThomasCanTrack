@@ -30,24 +30,44 @@ public final class Constants {
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackwidthMeters);
 
-    public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = 0.15;
-    public static final double kEncoderDistancePerPulse =
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+    // public static final int kEncoderCPR = 1024;
+    // public static final double kWheelDiameterMeters = 0.15;
+    // public static final double kEncoderDistancePerPulse =
+    //     // Assumes the encoders are directly mounted on the wheel shafts
+    //     (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+    // public static final double kEncoderDistancePerRevolution = kWheelDiameterMeters * Math.PI;
+
+    // Calculate distance per wheel revolution for CANSparkMax drivers
+    public static final int kEncoderCPR = 1;  // The INTERNAL counts per revolution on a SparkMax is 42
+    // Gear ratios for AndyMark AM14U5 Chassis from their user guide:
+    //  Ratio     8mm Gear    Lg. Cluster   Sm. Cluster   Lg. Output
+    //  5.95:1    14T         50T           24T           40T
+    //  7.31:1    14T         50T           21T           43T
+    //  8.45:1    14T         50T           19T           45T       (included)
+    //  10.71:1   14T         50T           16T           48T
+    //  12.75:1   14T         50T           14T           50T
+    public static final double kGearRatio = (50.0/14.0)*(45.0/19.0);  // 8.45
+    public static final double kWheelDiameterInch = 6.0;  // Measure and set this for wheel diameter
+    public static final double kConvertInchToMeter = (0.0254 /* m */ / 1.0 /* inch */);
+    public static final double kWheelDiameterMeters = kWheelDiameterInch * kConvertInchToMeter;  // 0.15 meters
+    // public static final double kEncoderDistancePerPulse =
+    //     // Assumes the encoders are directly mounted on the wheel shafts
+    //     (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
     public static final double kEncoderDistancePerRevolution = kWheelDiameterMeters * Math.PI;
+
+
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
     // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
-    public static final double ksVolts = 0.22 CHANGE THIS!;
-    public static final double kvVoltSecondsPerMeter = 1.98 CHANGE THIS!;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.2 CHANGE THIS!;
+    public static final double ksVolts = 0.0; //0.22 CHANGE THIS!;
+    public static final double kvVoltSecondsPerMeter = 0.0; //1.98 CHANGE THIS!;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.0; //0.2 CHANGE THIS!;
 
     // Example value only - as above, this must be tuned for your drive!
-    public static final double kPDriveVel = 8.5 CHANGE THIS!;
+    public static final double kPDriveVel = 0.0; //8.5 CHANGE THIS!;
   }
 
   public static final class OIConstants {
