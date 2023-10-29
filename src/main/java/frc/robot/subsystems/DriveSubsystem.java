@@ -16,9 +16,11 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 // import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+// import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 // import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -86,7 +88,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry =
         new DifferentialDriveOdometry(
             // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-            m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
+            // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
+            m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
+
+    // SmartDashboard.putData(m_odometry);
   }
 
   @Override
@@ -94,8 +99,15 @@ public class DriveSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
     m_odometry.update(
         // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-        m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
-      }
+        // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
+        m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
+    SmartDashboard.putNumber("m_leftEncoder", getLeftEncoderPosition());
+    SmartDashboard.putNumber("m_rightEncoder", getRightEncoderPosition());
+    SmartDashboard.putNumber("leftEncoder(Inch)", getLeftEncoderPosition()/DriveConstants.kConvertInchToMeter);
+    SmartDashboard.putNumber("rightEncoder(Inch)", getRightEncoderPosition()/DriveConstants.kConvertInchToMeter);
+    SmartDashboard.putNumber("Left Velocity", getLeftEncoderVelocity());
+    SmartDashboard.putNumber("Right Velocity", getRightEncoderVelocity());
+  }
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -113,7 +125,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
-    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
+    // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
   }
 
   /**
@@ -125,7 +138,8 @@ public class DriveSubsystem extends SubsystemBase {
     resetEncoders();
     m_odometry.resetPosition(
         // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance(), pose);
-        m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition(), pose);
+        // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition(), pose);
+        m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition(), pose);
   }
 
   /**
@@ -165,7 +179,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getAverageEncoderDistance() {
     // return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
-    return (m_leftEncoder.getPosition() + m_rightEncoder.getPosition()) / 2.0;
+    // return (m_leftEncoder.getPosition() + m_rightEncoder.getPosition()) / 2.0;
+    return (getLeftEncoderPosition() + getRightEncoderPosition()) / 2.0;
   }
 
   /**
@@ -173,8 +188,8 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the left drive encoder
    */
-  public RelativeEncoder getLeftEncoder() {
-    return m_leftEncoder;
+  public double getLeftEncoderPosition() {
+    return m_leftEncoder.getPosition();
   }
 
   /**
@@ -182,8 +197,16 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the right drive encoder
    */
-  public RelativeEncoder getRightEncoder() {
-    return m_rightEncoder;
+  public double getRightEncoderPosition() {
+    return -m_rightEncoder.getPosition();
+  }
+
+  public double getLeftEncoderVelocity() {
+    return m_leftEncoder.getVelocity();
+  }
+
+  public double getRightEncoderVelocity() {
+    return -m_rightEncoder.getVelocity();
   }
 
   /**

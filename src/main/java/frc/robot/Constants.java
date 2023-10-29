@@ -18,56 +18,44 @@ public final class Constants {
   public static final class DriveConstants {
     public static final int kLeftFrontCAN = 9;
     public static final int kLeftRearCAN = 10;
-    public static final int kRightFrontCAN = 8;
-    public static final int kRightRearCAN = 7;
+    public static final int kRightFrontCAN = 7;
+    public static final int kRightRearCAN = 8;
 
     // public static final int[] kLeftEncoderPorts = new int[] {0, 1};
     // public static final int[] kRightEncoderPorts = new int[] {2, 3};
     // public static final boolean kLeftEncoderReversed = false;
     // public static final boolean kRightEncoderReversed = true;
 
-    public static final double kTrackwidthMeters = 0.69;
+    public static final double kConvertInchToMeter = 0.0254;
+
+    public static final double kTrackwidthInches = 18.5;
+    public static final double kTrackwidthMeters = kTrackwidthInches * kConvertInchToMeter;
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackwidthMeters);
 
-    // public static final int kEncoderCPR = 1024;
-    // public static final double kWheelDiameterMeters = 0.15;
+    public static final int kEncoderCPR = 1;
+    public static final double kWheelDiameterInches = 6.0;
+    public static final double kGearRatio = 8.45;
+    public static final double kWheelDiameterMeters = kWheelDiameterInches * kConvertInchToMeter;
     // public static final double kEncoderDistancePerPulse =
     //     // Assumes the encoders are directly mounted on the wheel shafts
     //     (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-    // public static final double kEncoderDistancePerRevolution = kWheelDiameterMeters * Math.PI;
-
-    // Calculate distance per wheel revolution for CANSparkMax drivers
-    public static final int kEncoderCPR = 1;  // The INTERNAL counts per revolution on a SparkMax is 42
-    // Gear ratios for AndyMark AM14U5 Chassis from their user guide:
-    //  Ratio     8mm Gear    Lg. Cluster   Sm. Cluster   Lg. Output
-    //  5.95:1    14T         50T           24T           40T
-    //  7.31:1    14T         50T           21T           43T
-    //  8.45:1    14T         50T           19T           45T       (included)
-    //  10.71:1   14T         50T           16T           48T
-    //  12.75:1   14T         50T           14T           50T
-    public static final double kGearRatio = (50.0/14.0)*(45.0/19.0);  // 8.45
-    public static final double kWheelDiameterInch = 6.0;  // Measure and set this for wheel diameter
-    public static final double kConvertInchToMeter = (0.0254 /* m */ / 1.0 /* inch */);
-    public static final double kWheelDiameterMeters = kWheelDiameterInch * kConvertInchToMeter;  // 0.15 meters
-    // public static final double kEncoderDistancePerPulse =
-    //     // Assumes the encoders are directly mounted on the wheel shafts
-    //     (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-    public static final double kEncoderDistancePerRevolution = kWheelDiameterMeters * Math.PI;
-
-
+    public static final double kEncoderDistancePerRevolution = (kWheelDiameterMeters * Math.PI) / kGearRatio;  // !!! Use this value in SysID!
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
     // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
-    public static final double ksVolts = 0.0; //0.22 CHANGE THIS!;
-    public static final double kvVoltSecondsPerMeter = 0.0; //1.98 CHANGE THIS!;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.0; //0.2 CHANGE THIS!;
+    public static final double ksVolts = 0.22 CHANGE THIS!;
+    public static final double kvVoltSecondsPerMeter = 1.98 CHANGE THIS!;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.2 CHANGE THIS!;
 
-    // Example value only - as above, this must be tuned for your drive!
-    public static final double kPDriveVel = 0.0; //8.5 CHANGE THIS!;
+    // SysID file used: C:\Users\FabLab9\FRC2024\sysid_data20231028-160422.json
+    public static final double ksVolts = 0.10884; // Don't change!
+    public static final double kvVoltSecondsPerMeter = 1.0835; // Don't change!
+    public static final double kaVoltSecondsSquaredPerMeter = 0.13958; // Don't change!
+    public static final double kPDriveVel = 0.81903; // Don't change!
   }
 
   public static final class OIConstants {
