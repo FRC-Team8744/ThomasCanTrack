@@ -40,7 +40,8 @@ public final class Constants {
     // public static final double kEncoderDistancePerPulse =
     //     // Assumes the encoders are directly mounted on the wheel shafts
     //     (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-    public static final double kEncoderDistancePerRevolution = (kWheelDiameterMeters * Math.PI) / kGearRatio;  // !!! Use this value in SysID!
+    public static final double kUnitsPerRotation = (kWheelDiameterMeters * Math.PI);  // !!! Use this value in SysID!
+    public static final double kEncoderDistancePerRevolution = (kWheelDiameterMeters * Math.PI) / kGearRatio;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
@@ -51,11 +52,11 @@ public final class Constants {
     // public static final double kvVoltSecondsPerMeter = 1.98 CHANGE THIS!;
     // public static final double kaVoltSecondsSquaredPerMeter = 0.2 CHANGE THIS!;
 
-    // SysID file used: C:\Users\FabLab9\FRC2024\sysid_data20231028-160422.json
-    public static final double ksVolts = 0.10884; // Don't change!
-    public static final double kvVoltSecondsPerMeter = 1.0835; // Don't change!
-    public static final double kaVoltSecondsSquaredPerMeter = 0.13958; // Don't change!
-    public static final double kPDriveVel = 0.81903; // Don't change!
+    // SysID file used: C:\Users\FabLab9\FRC2024\ThomasCanTrack\sysid_data\sysid_data20231029-134230.json
+    public static final double ksVolts = 0.11161; // Don't change!
+    public static final double kvVoltSecondsPerMeter = 2.2496; // Don't change!
+    public static final double kaVoltSecondsSquaredPerMeter = 0.346; // Don't change!
+    public static final double kPDriveVel = 2.4626; // Don't change!
   }
 
   public static final class OIConstants {
@@ -69,8 +70,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 1; //3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 0.3; //1;
+    public static final double kMaxSpeedMetersPerSecond = 0.5; //3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
 
     // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
     public static final double kRamseteB = 2;

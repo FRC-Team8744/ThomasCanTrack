@@ -73,6 +73,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    // Default top speed
+    m_drive.setMaxOutput(0.5);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -95,8 +97,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry =
         new DifferentialDriveOdometry(
             // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-            m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
-            // m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
+            // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
+            m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
 
     // SmartDashboard.putData(m_odometry);
   }
@@ -106,14 +108,19 @@ public class DriveSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
     m_odometry.update(
         // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-        m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
-        // m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
+        // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
+        m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
     SmartDashboard.putNumber("m_leftEncoder", getLeftEncoderPosition());
     SmartDashboard.putNumber("m_rightEncoder", getRightEncoderPosition());
     SmartDashboard.putNumber("leftEncoder(Inch)", getLeftEncoderPosition()/DriveConstants.kConvertInchToMeter);
     SmartDashboard.putNumber("rightEncoder(Inch)", getRightEncoderPosition()/DriveConstants.kConvertInchToMeter);
     SmartDashboard.putNumber("Left Velocity", getLeftEncoderVelocity());
     SmartDashboard.putNumber("Right Velocity", getRightEncoderVelocity());
+
+    SmartDashboard.putNumber("Pose Rotation", m_odometry.getPoseMeters().getRotation().getDegrees());
+    SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getTranslation().getX());
+    SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getTranslation().getY());
+
   }
 
   /**
@@ -132,8 +139,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
-    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
-    // return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
+    // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
   }
 
   /**
@@ -145,8 +152,8 @@ public class DriveSubsystem extends SubsystemBase {
     resetEncoders();
     m_odometry.resetPosition(
         // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance(), pose);
-        m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition(), pose);
-        // m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition(), pose);
+        // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition(), pose);
+        m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition(), pose);
   }
 
   /**
