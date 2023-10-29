@@ -85,8 +85,8 @@ public class DriveSubsystem extends SubsystemBase {
     // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRevolution);
     m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRevolution);
-    // m_leftEncoder.setVelocityConversionFactor(1.0);
-    // m_rightEncoder.setVelocityConversionFactor(1.0);
+    m_leftEncoder.setVelocityConversionFactor(1.0);
+    m_rightEncoder.setVelocityConversionFactor(1.0);
     // WRONG -> SysId relies on the SparkMax controllers to be configured, so we must store the above settings in flash memory
     // leftFrontSparkMax.burnFlash();
     // leftRearSparkMax.burnFlash();
@@ -140,7 +140,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
-    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
+    return new DifferentialDriveWheelSpeeds(-getLeftEncoderVelocity(), -getRightEncoderVelocity());
   }
 
   /**
@@ -173,6 +173,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double leftVolts, double rightVolts) {
+    SmartDashboard.putNumber("Left Voltage", leftVolts);
+    SmartDashboard.putNumber("Right Voltage", rightVolts);
+
     m_leftMotors.setVoltage(leftVolts);
     m_rightMotors.setVoltage(rightVolts);
     m_drive.feed();
