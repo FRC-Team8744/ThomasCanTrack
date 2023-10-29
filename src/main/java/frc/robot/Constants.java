@@ -47,9 +47,9 @@ public final class Constants {
     // for *your* robot's drive.
     // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
-    public static final double ksVolts = 0.22 CHANGE THIS!;
-    public static final double kvVoltSecondsPerMeter = 1.98 CHANGE THIS!;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.2 CHANGE THIS!;
+    // public static final double ksVolts = 0.22 CHANGE THIS!;
+    // public static final double kvVoltSecondsPerMeter = 1.98 CHANGE THIS!;
+    // public static final double kaVoltSecondsSquaredPerMeter = 0.2 CHANGE THIS!;
 
     // SysID file used: C:\Users\FabLab9\FRC2024\sysid_data20231028-160422.json
     public static final double ksVolts = 0.10884; // Don't change!
@@ -69,8 +69,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+    public static final double kMaxSpeedMetersPerSecond = 1; //3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 0.3; //1;
 
     // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
     public static final double kRamseteB = 2;
