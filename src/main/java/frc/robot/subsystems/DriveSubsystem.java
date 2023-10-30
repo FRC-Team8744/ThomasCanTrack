@@ -9,17 +9,24 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+// import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 // import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 // import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+// import frc.robot.RobotContainer;
 // import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 // import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,6 +55,13 @@ public class DriveSubsystem extends SubsystemBase {
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
+  
+  public final PIDController m_leftPIDController = new PIDController(DriveConstants.kPDriveVel, 0, 0);
+  public final PIDController m_rightPIDController = new PIDController(DriveConstants.kPDriveVel, 0, 0);
+
+  // Gains are from a SysId check of Thomas - Don't change!
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter);
+
   // The left-side drive encoder
   // private final Encoder m_leftEncoder =
   //     new Encoder(
@@ -71,10 +85,13 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
 
+  // Create Field2d for robot and trajectory visualizations.
+  public Field2d m_field;
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Default top speed
-    m_drive.setMaxOutput(0.5);
+    m_drive.setMaxOutput(1.0);
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -85,8 +102,9 @@ public class DriveSubsystem extends SubsystemBase {
     // m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRevolution);
     m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistancePerRevolution);
-    m_leftEncoder.setVelocityConversionFactor(1.0);
-    m_rightEncoder.setVelocityConversionFactor(1.0);
+    m_leftEncoder.setVelocityConversionFactor(DriveConstants.kVelocityRatio);
+    m_rightEncoder.setVelocityConversionFactor(DriveConstants.kVelocityRatio);
+
     // WRONG -> SysId relies on the SparkMax controllers to be configured, so we must store the above settings in flash memory
     // leftFrontSparkMax.burnFlash();
     // leftRearSparkMax.burnFlash();
@@ -99,6 +117,13 @@ public class DriveSubsystem extends SubsystemBase {
             // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
             // m_gyro.getRotation2d(), m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
             m_gyro.getRotation2d(), getLeftEncoderPosition(), getRightEncoderPosition());
+
+    // Create and push Field2d to SmartDashboard.
+    m_field = new Field2d();
+    SmartDashboard.putData(m_field);
+    
+    // Update robot position on Field2d.
+    m_field.setRobotPose(getPose());
 
     // SmartDashboard.putData(m_odometry);
   }
@@ -121,6 +146,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getTranslation().getX());
     SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getTranslation().getY());
 
+        
+    // Update robot position on Field2d.
+    m_field.setRobotPose(getPose());
   }
 
   /**
@@ -140,7 +168,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
     // return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(), m_rightEncoder.getVelocity());
-    return new DifferentialDriveWheelSpeeds(-getLeftEncoderVelocity(), -getRightEncoderVelocity());
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(),getRightEncoderVelocity());
   }
 
   /**
@@ -163,7 +191,30 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    m_drive.arcadeDrive(fwd, rot);
+    // m_drive.arcadeDrive(fwd, rot);  <- Convert to arcadeDrivePID
+
+    // Apply Deadband (done by arcadeDrive method)
+    fwd = MathUtil.applyDeadband(fwd, 0.02);  // fix magic number
+    rot = MathUtil.applyDeadband(rot, 0.02);
+
+    // Square inputs for human control?
+    //var speeds = arcadeDriveIK(xSpeed, zRotation, squareInputs);
+
+    var wheelSpeeds = DriveConstants.kDriveKinematics.toWheelSpeeds(new ChassisSpeeds(fwd, 0.0, rot));
+
+    final double leftFeedforward = m_feedforward.calculate(wheelSpeeds.leftMetersPerSecond);
+    final double rightFeedforward = m_feedforward.calculate(wheelSpeeds.rightMetersPerSecond);
+
+    final double leftOutput = m_leftPIDController.calculate(getLeftEncoderVelocity(), wheelSpeeds.leftMetersPerSecond);
+    final double rightOutput = m_rightPIDController.calculate(getRightEncoderVelocity(), wheelSpeeds.rightMetersPerSecond);
+
+    // Limit output?
+    //   m_leftMotor.set(speeds.left * m_maxOutput);
+    //   m_rightMotor.set(speeds.right * m_maxOutput);
+
+    // m_leftMotors.setVoltage(leftOutput + leftFeedforward);
+    // m_rightMotors.setVoltage(rightOutput + rightFeedforward);
+    tankDriveVolts(leftOutput + leftFeedforward, rightOutput + rightFeedforward);
   }
 
   /**

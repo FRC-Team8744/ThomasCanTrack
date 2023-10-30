@@ -43,6 +43,8 @@ public final class Constants {
     public static final double kUnitsPerRotation = (kWheelDiameterMeters * Math.PI);  // !!! Use this value in SysID!
     public static final double kEncoderDistancePerRevolution = (kWheelDiameterMeters * Math.PI) / kGearRatio;
 
+    public static final double kVelocityRatio = 1/kGearRatio;  // Motor spins kGearRatio times before output wheel turns once.
+
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
@@ -56,7 +58,8 @@ public final class Constants {
     public static final double ksVolts = 0.11161; // Don't change!
     public static final double kvVoltSecondsPerMeter = 2.2496; // Don't change!
     public static final double kaVoltSecondsSquaredPerMeter = 0.346; // Don't change!
-    public static final double kPDriveVel = 2.4626; // Don't change!
+
+    public static final double kPDriveVel = 0.001; // Don't change!
   }
 
   public static final class OIConstants {
